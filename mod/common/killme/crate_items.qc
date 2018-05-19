@@ -62,7 +62,6 @@ AUTOCVAR(g_random_crates_loot_drink_sue_chance, float, 0.1, "Hehehe");
 AUTOCVAR(g_random_crates_loot_speed_speed, float, 1.5, "Movement speed while holding speed item");
 AUTOCVAR(g_random_crates_loot_speed_weaponspeed, float, 1.5, "Weapon action speed");
 AUTOCVAR(g_random_crates_loot_speed_rate, float, 0.75, "Weapon attack rate speed (lower is faster)");
-AUTOCVAR(g_random_crates_loot_skull_time, float, 10, "Rough time between pain");
 AUTOCVAR(g_random_crates_loot_skull_damage, float, 20, "Pain");
 AUTOCVAR(g_random_crates_loot_clip_chance, float, 0.51, "Chance for ammo to not be consumed");
 
@@ -101,7 +100,7 @@ bool crate_items_isdual(entity wep)
 		case WEP_MORTAR:
 			return true;
 	}
-	return false;
+	return !(wep.spawnflags & WEP_FLAG_NODUAL);
 }
 
 MUTATOR_HOOKFUNCTION(crate_items, ItemTouch)
@@ -124,16 +123,6 @@ MUTATOR_HOOKFUNCTION(crate_items, PlayerPreThink)
 	entity player = M_ARGV(0, entity);
 
 	if(game_stopped || IS_DEAD(player) || frametime || !IS_PLAYER(player)) return;
-
-	if(player.rcrates_item & BIT(CRATE_LOOT_SKULL))
-	{
-		if(time >= player.bloodloss_timer) // we can safely reuse the field, if bloodloss is in effect they don't need to stack!
-		{
-			if(player.event_damage)
-				player.event_damage(player, player, player, autocvar_g_random_crates_loot_skull_damage, DEATH_ROT.m_id, DMG_NOWEP, player.origin, '0 0 0');
-			player.bloodloss_timer = time + 5 + random() * autocvar_g_random_crates_loot_skull_time;
-		}
-	}
 
 	if(player.rcrates_item & BIT(CRATE_LOOT_MAGNET))
 	{
@@ -235,10 +224,14 @@ int crate_item_handletouch(entity this, entity toucher)
 			if(!autocvar_g_random_crates_loot_drink_dontsue && random() < autocvar_g_random_crates_loot_drink_sue_chance)
 			{
 				MorningRescue(toucher);
-				toucher.rcrates_item &= ~BIT(CRATE_LOOT_SKULL);
 				return -1; // no message, it has its own ;)
 			}
-			toucher.rcrates_item &= ~BIT(CRATE_LOOT_SKULL);
+		}
+		case CRATE_LOOT_SKULL:
+		{
+			if(toucher.event_damage)
+				toucher.event_damage(toucher, toucher, toucher, autocvar_g_random_crates_loot_skull_damage, DEATH_ROT.m_id, DMG_NOWEP, toucher.origin, '0 0 0');
+			return true;
 		}
 		case CRATE_LOOT_AMMO:
 		{
