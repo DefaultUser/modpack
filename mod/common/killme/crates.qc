@@ -11,6 +11,7 @@ AUTOCVAR(g_random_crates_loot_count_min, int, 2, "Minimum number of items each c
 AUTOCVAR(g_random_crates_loot_count_max, int, 5, "Maximum number of items each crate can drop");
 AUTOCVAR(g_random_crates_loot_lifetime, float, 5, "Lifespan of the spawned items");
 AUTOCVAR(g_random_crates_loot_tuba_chance, float, 0.1, "Chance for tuba to spawn as opposed to most weapons");
+AUTOCVAR(g_random_crates_loot_blaster_chance, float, 1.3, "Chance for blaster to spawn as opposed to most weapons");
 AUTOCVAR(g_random_crates_loot_weapon_chance, float, 0.1, "Chance for a weapon to spawn from the crate");
 AUTOCVAR(g_random_crates_loot_health_chance, float, 0.25, "Chance for a health or armor item to spawn from the crate");
 AUTOCVAR(g_random_crates_loot_powerup_chance, float, 0.075, "Chance for a powerup to spawn from the crate");
@@ -98,8 +99,13 @@ void crate_dropweapon(entity e, vector org)
 			continue; // never ever do the attacks
 		if(it.spawnflags & WEP_FLAG_SUPERWEAPON)
 			continue; // no power weapons thank you very much
+		float thechance = 1;
+		if(it == WEP_TUBA)
+			thechance = autocvar_g_random_crates_loot_tuba_chance;
+		else if(it == WEP_BLASTER)
+			thechance = autocvar_g_random_crates_loot_blaster_chance;
 		if(W_IsWeaponThrowable(e, it.m_id))
-			RandomSelection_AddEnt(it, ((it == WEP_TUBA) ? autocvar_g_random_crates_loot_tuba_chance : 1), 1);
+			RandomSelection_AddEnt(it, thechance, 1);
 	});
 
 	random_crates_SpawnWeapon(e, RandomSelection_chosen_ent, org);
