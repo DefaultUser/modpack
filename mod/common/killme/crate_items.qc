@@ -221,11 +221,12 @@ int crate_item_handletouch(entity this, entity toucher)
 		case CRATE_LOOT_DRINK:
 		{
 			// hehe
-			if(!autocvar_g_random_crates_loot_drink_dontsue && random() < autocvar_g_random_crates_loot_drink_sue_chance)
+			if(!autocvar_g_random_crates_loot_drink_dontsue && random() <= autocvar_g_random_crates_loot_drink_sue_chance)
 			{
 				MorningRescue(toucher);
 				return -1; // no message, it has its own ;)
 			}
+			break; // handle normally
 		}
 		case CRATE_LOOT_SKULL:
 		{
