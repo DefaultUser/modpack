@@ -7,7 +7,6 @@ enum
 	CRATE_LOOT_MAGNET,
 	CRATE_LOOT_DRINK,
 	CRATE_LOOT_AMMO,
-	CRATE_LOOT_SPEED,
 	CRATE_LOOT_SKULL,
 	CRATE_LOOT_GASMASK,
 	CRATE_LOOT_SCUBAGEAR,
@@ -22,7 +21,6 @@ MODEL(CRATE_LOOT_HEART, "models/crate_items/heart.iqm");
 MODEL(CRATE_LOOT_MAGNET, "models/crate_items/magnet.iqm");
 MODEL(CRATE_LOOT_DRINK, "models/crate_items/drink.iqm");
 MODEL(CRATE_LOOT_AMMO, "models/crate_items/ammo.iqm");
-MODEL(CRATE_LOOT_SPEED, "models/crate_items/speed.iqm");
 MODEL(CRATE_LOOT_SKULL, "models/crate_items/skull.iqm");
 MODEL(CRATE_LOOT_GASMASK, "models/crate_items/gasmask.iqm");
 MODEL(CRATE_LOOT_SCUBAGEAR, "models/crate_items/scubagear.iqm");
@@ -42,7 +40,6 @@ string crate_item_getmessage(int id)
 		case CRATE_LOOT_MAGNET: return "Items magnetise towards you!";
 		case CRATE_LOOT_DRINK: return "Moaning Lescue!";
 		case CRATE_LOOT_AMMO: return "Ammo refilled!";
-		case CRATE_LOOT_SPEED: return "Gotta go fast!";
 		case CRATE_LOOT_SKULL: return "Mistakes were made.";
 		case CRATE_LOOT_GASMASK: return "You can swim in slime!";
 		case CRATE_LOOT_SCUBAGEAR: return "No more drowning!";
@@ -59,9 +56,6 @@ string crate_item_getmessage(int id)
 AUTOCVAR(g_random_crates_loot_magnet_range, float, 100, "Pickup range of the magnet item");
 AUTOCVAR(g_random_crates_loot_drink_dontsue, bool, false, "Please");
 AUTOCVAR(g_random_crates_loot_drink_sue_chance, float, 0.1, "Hehehe");
-AUTOCVAR(g_random_crates_loot_speed_speed, float, 1.5, "Movement speed while holding speed item");
-AUTOCVAR(g_random_crates_loot_speed_weaponspeed, float, 1.5, "Weapon action speed");
-AUTOCVAR(g_random_crates_loot_speed_rate, float, 0.75, "Weapon attack rate speed (lower is faster)");
 AUTOCVAR(g_random_crates_loot_skull_damage, float, 20, "Pain");
 AUTOCVAR(g_random_crates_loot_clip_chance, float, 0.51, "Chance for ammo to not be consumed");
 
@@ -114,7 +108,7 @@ MUTATOR_HOOKFUNCTION(crate_items, ItemTouch)
 	entity item = M_ARGV(0, entity);
 	entity player = M_ARGV(1, entity);
 
-	if(Item_IsLoot(item) && item.weapon && (player.weapons & item.itemdef.m_weapon.m_wepset) && crate_items_isdual(item.itemdef.m_weapon) && item.owner != player && (player.rcrates_item & BIT(CRATE_LOOT_ARSENAL)))
+	if(Item_IsLoot(item) && item.weapon && (STAT(WEAPONS, player) & item.itemdef.m_weapon.m_wepset) && crate_items_isdual(item.itemdef.m_weapon) && item.owner != player && (player.rcrates_item & BIT(CRATE_LOOT_ARSENAL)))
 		PS(player).dual_weapons |= item.itemdef.m_weapon.m_wepset; // dual it up!
 }
 
@@ -136,31 +130,6 @@ MUTATOR_HOOKFUNCTION(crate_items, PlayerPreThink)
 			}
 		});
 	}
-}
-
-MUTATOR_HOOKFUNCTION(crate_items, WeaponRateFactor)
-{
-	entity player = M_ARGV(1, entity);
-
-	if(player.rcrates_item & BIT(CRATE_LOOT_SPEED))
-		M_ARGV(0, float) *= autocvar_g_random_crates_loot_speed_rate;
-}
-
-MUTATOR_HOOKFUNCTION(crate_items, WeaponSpeedFactor)
-{
-	entity player = M_ARGV(1, entity);
-
-	if(player.rcrates_item & BIT(CRATE_LOOT_SPEED))
-		M_ARGV(0, float) *= autocvar_g_random_crates_loot_speed_weaponspeed;
-}
-
-MUTATOR_HOOKFUNCTION(crate_items, PlayerPhysics_UpdateStats)
-{
-	entity player = M_ARGV(0, entity);
-	// these automatically reset, no need to worry
-
-	if(player.rcrates_item & BIT(CRATE_LOOT_SPEED))
-		STAT(MOVEVARS_HIGHSPEED, player) *= autocvar_g_random_crates_loot_speed_speed;
 }
 
 MUTATOR_HOOKFUNCTION(crate_items, Damage_Calculate)

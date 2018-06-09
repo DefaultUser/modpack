@@ -173,7 +173,7 @@ MUTATOR_HOOKFUNCTION(egoass, PlayerDies)
 	int wepcount = 0, mywepcount = 0;
 
 	FOREACH(Weapons, weaponsInMap & (it.m_wepset), LAMBDA(
-		if(attacker.weapons & (it.m_wepset))
+		if(STAT(WEAPONS, attacker) & (it.m_wepset))
 			++mywepcount;
 		++wepcount;
 	));
