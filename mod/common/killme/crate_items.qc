@@ -92,6 +92,7 @@ bool crate_items_isdual(entity wep)
 		case WEP_VORTEX:
 		case WEP_RIFLE:
 		case WEP_MORTAR:
+		case WEP_DEVASTATOR:
 			return true;
 	}
 	return !(wep.spawnflags & WEP_FLAG_NODUAL);

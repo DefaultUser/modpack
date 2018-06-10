@@ -645,3 +645,17 @@ MUTATOR_HOOKFUNCTION(egoass, ClientDisconnect)
 		Send_Notification(NOTIF_ALL, NULL, MSG_ANNCE, ANNCE_JEFF_RAGEQUIT); // we use Send_Notification directly, because the player is about to be disconnected
 }
 #endif
+
+bool jeff_AkimboWeaponAllowed(entity wep)
+{
+	switch(wep)
+	{
+		case WEP_VORTEX:
+		case WEP_MORTAR:
+		case WEP_DEVASTATOR:
+		case WEP_RIFLE:
+			return false;
+	}
+
+	return true;
+}
