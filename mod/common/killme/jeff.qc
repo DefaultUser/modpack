@@ -657,5 +657,5 @@ bool jeff_AkimboWeaponAllowed(entity wep)
 			return false;
 	}
 
-	return true;
+	return !(wep.spawnflags & WEP_FLAG_NODUAL);
 }
