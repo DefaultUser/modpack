@@ -51,7 +51,7 @@ MUTATOR_HOOKFUNCTION(random_crates, SV_StartFrame)
 
 	// much easier to just count the active crates than to make sure at every case that a counter is saved
 	int rcrates_count = 0;
-	IL_EACH(g_crates, it.health > 0,
+	IL_EACH(g_crates, GetResourceAmount(it, RESOURCE_HEALTH) > 0,
 	{
 		++rcrates_count;
 	});
@@ -219,7 +219,7 @@ void crate_die(entity this)
 	Send_Effect(EFFECT_EXPLOSION_SMALL, this.origin, '0 0 0', 1);
 	sound(this, CH_SHOTS, SND_CRATE_BREAK_RANDOM(), VOL_BASEVOICE, ATTEN_NORM);
 
-	this.health = 0;
+	SetResourceAmountExplicit(this, RESOURCE_HEALTH, 0);
 	this.takedamage = DAMAGE_NO;
 	this.event_damage = func_null;
 	setthink(this, SUB_Remove);
@@ -228,12 +228,12 @@ void crate_die(entity this)
 
 void crate_damage(entity this, entity inflictor, entity attacker, float damage, int deathtype, .entity weaponentity, vector hitloc, vector force)
 {
-	if(this.health <= 0 || damage <= 0)
+	if(GetResourceAmount(this, RESOURCE_HEALTH) <= 0 || damage <= 0)
 		return;
 
-	this.health -= damage;
+	TakeResource(this, RESOURCE_HEALTH, damage);
 
-	if(this.health <= 0)
+	if(GetResourceAmount(this, RESOURCE_HEALTH) <= 0)
 	{
 		crate_die(this);
 		return;
@@ -263,7 +263,7 @@ void crate_setup(entity crate)
 	crate.scale = autocvar_g_random_crates_scale;
 	crate.angles_y = floor(random() * 180);
 	crate.takedamage = DAMAGE_AIM;
-	crate.health = 50;
+	SetResourceAmountExplicit(crate, RESOURCE_HEALTH, 50);
 	crate.solid = SOLID_BBOX;
 	crate.event_damage = crate_damage;
 	crate.reset = SUB_Remove;
