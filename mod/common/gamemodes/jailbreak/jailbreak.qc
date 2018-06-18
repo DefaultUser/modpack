@@ -35,9 +35,7 @@ MUTATOR_HOOKFUNCTION(cl_jb, DrawCrosshair)
 
 NET_HANDLE(ENT_CLIENT_JAILCAMERA, bool isnew)
 {
-	this.origin_x = ReadCoord();
-	this.origin_y = ReadCoord();
-	this.origin_z = ReadCoord();
+	this.origin = ReadVector();
 	setorigin(this, this.origin);
 		
 	this.angles_x = ReadAngle();
@@ -455,8 +453,8 @@ void JB_Imprison(entity targ, entity attacker)
 		//return;
 	}
 
-	targ.health = autocvar_g_jailbreak_prisoner_health;
-	targ.armorvalue = autocvar_g_jailbreak_prisoner_armor;
+	SetResourceAmountExplicit(targ, RESOURCE_HEALTH, autocvar_g_jailbreak_prisoner_health);
+	SetResourceAmountExplicit(targ, RESOURCE_ARMOR, autocvar_g_jailbreak_prisoner_armor);
 
 	targ.jb_had_unlimited_ammo = (targ.items & IT_UNLIMITED_WEAPON_AMMO);
 
@@ -506,8 +504,8 @@ void JB_Release(entity player, entity saviour)
 
 	if(g_jailbreak_jail_deathmatch)
 	{
-		player.health = max(player.health, autocvar_g_jailbreak_prisoner_health);
-		player.armorvalue = max(player.armorvalue, autocvar_g_jailbreak_prisoner_armor);
+		SetResourceAmountExplicit(player, RESOURCE_HEALTH, max(GetResourceAmount(player, RESOURCE_HEALTH), autocvar_g_jailbreak_prisoner_health));
+		SetResourceAmountExplicit(player, RESOURCE_ARMOR, max(GetResourceAmount(player, RESOURCE_ARMOR), autocvar_g_jailbreak_prisoner_armor));
 	}
 }
 
@@ -737,9 +735,7 @@ bool jailcamera_send(entity this, entity to, int sf)
 {
 	WriteHeader(MSG_ENTITY, ENT_CLIENT_JAILCAMERA);
 
-	WriteCoord(MSG_ENTITY, this.origin_x);
-	WriteCoord(MSG_ENTITY, this.origin_y);
-	WriteCoord(MSG_ENTITY, this.origin_z);
+	WriteVector(MSG_ENTITY, this.origin);
 
 	WriteAngle(MSG_ENTITY, this.angles_x);
 	WriteAngle(MSG_ENTITY, this.angles_y);
@@ -958,7 +954,7 @@ void JB_ControlPoint_Touch(entity this, entity toucher)
 	if(jb_roundover)
 		return;
 
-	if(toucher.health < 1 || STAT(FROZEN, toucher))
+	if(GetResourceAmount(toucher, RESOURCE_HEALTH) < 1 || STAT(FROZEN, toucher))
 		return;
 
 	if(game_stopped)
