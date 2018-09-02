@@ -340,7 +340,7 @@ MUTATOR_HOOKFUNCTION(egoass, PlayerDies)
 	else
 		jeff_Announcer_Send(attacker, false, ANNCE_JEFF_MULTIKILL);
 
-	if(attacker.vehicle && deathtype == DEATH_VH_CRUSH.m_id && attacker.vkill_count && !!(attacker.vkill_count % 2))
+	if(attacker.vehicle && deathtype == DEATH_VH_CRUSH.m_id && (attacker.vkill_count % 2))
 		jeff_Announcer_Send(attacker, false, ANNCE_JEFF_ROADKILL);
 
 	if(attacker.vehicle && attacker.vkill_count == autocvar_jeff_announce_roadrage_count)
