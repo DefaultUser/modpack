@@ -97,7 +97,7 @@ void crate_dropweapon(entity e, vector org)
 	{
 		if((it.spawnflags & WEP_FLAG_HIDDEN) && (it.spawnflags & WEP_FLAG_MUTATORBLOCKED))
 			continue; // never ever do the attacks
-		if(it.spawnflags & WEP_FLAG_SUPERWEAPON)
+		if((it.spawnflags & WEP_FLAG_SUPERWEAPON) && it != WEP_OVERKILL_HMG && it != WEP_OVERKILL_RPC)
 			continue; // no power weapons thank you very much
 		float thechance = 1;
 		if(it == WEP_TUBA)
